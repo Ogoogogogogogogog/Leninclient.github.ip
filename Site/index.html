@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lenin Client</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #05070f;
+      --accent: #00f0ff;
+      --purple: #c084fc;
+      --pink: #ff6bcb;
+      --text: #f0f4ff;
+      --text-muted: #a0b0d8;
+      --glass: rgba(15, 20, 40, 0.62);
+      --border: rgba(0, 240, 255, 0.28);
+      --glow: 0 0 50px rgba(0, 240, 255, 0.5);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .particles-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(26px);
+      -webkit-backdrop-filter: blur(26px);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      box-shadow: var(--glow), inset 0 0 30px rgba(0,240,255,0.12);
+    }
+
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.4s;
+      background: rgba(5,7,15,0.45);
+      backdrop-filter: blur(14px);
+    }
+
+    header.scrolled {
+      background: rgba(5,7,15,0.85);
+      padding: 1.1rem 5%;
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.3rem;
+      font-weight: 900;
+      letter-spacing: -2.5px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 40px rgba(0,240,255,0.7);
+    }
+
+    .nav {
+      display: flex;
+      gap: 2.8rem;
+      align-items: center;
+    }
+
+    .nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .nav a:hover {
+      color: white;
+      text-shadow: 0 0 20px var(--accent);
+    }
+
+    .profile span {
+      color: var(--accent);
+      font-weight: 700;
+      text-shadow: 0 0 15px var(--accent);
+    }
+
+    /* Auth */
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .auth-box {
+      width: 100%;
+      max-width: 500px;
+      padding: 4.2rem 3.2rem;
+      text-align: center;
+      animation: fadeInUp 1.4s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(70px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-box h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 5.2rem;
+      font-weight: 900;
+      letter-spacing: -4.5px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--pink), var(--accent));
+      background-size: 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1.2rem;
+      animation: gradientFlow 14s ease infinite;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .auth-subtitle {
+      font-size: 1.6rem;
+      color: var(--text-muted);
+      margin-bottom: 3.2rem;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 2.5rem;
+      background: rgba(20,25,55,0.4);
+      border-radius: 16px;
+      padding: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .tab {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 12px;
+    }
+
+    .tab.active {
+      background: rgba(0,240,255,0.18);
+      color: white;
+      box-shadow: 0 0 20px rgba(0,240,255,0.4);
+    }
+
+    .form-group {
+      margin-bottom: 2.2rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 1.3rem 1.8rem;
+      background: rgba(20,25,60,0.7);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      color: white;
+      font-size: 1.2rem;
+      transition: all 0.35s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 6px rgba(0,240,255,0.25), inset 0 0 15px rgba(0,240,255,0.15);
+    }
+
+    .btn-auth {
+      width: 100%;
+      padding: 1.5rem;
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), #0099ff, var(--purple));
+      background-size: 300%;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.4s;
+      box-shadow: var(--glow);
+      animation: pulseBtn 6s infinite;
+    }
+
+    @keyframes pulseBtn {
+      0%,100% { background-position: 0% 50%; }
+      50%     { background-position: 100% 50%; }
+    }
+
+    .btn-auth:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 35px 80px rgba(0,240,255,0.6);
+    }
+
+    .info-text {
+      margin-top: 2.8rem;
+      font-size: 1.05rem;
+      color: #888;
+    }
+
+    /* Main content */
+    .main-content { display: none; }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 5%;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(6.5rem, 16vw, 14rem);
+      font-weight: 900;
+      letter-spacing: -9px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 80px rgba(0,240,255,0.6);
+    }
+
+    .tagline {
+      font-size: clamp(1.6rem, 5.5vw, 2.4rem);
+      color: var(--text-muted);
+      max-width: 1100px;
+      margin-bottom: 5.5rem;
+      line-height: 1.4;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 1.4rem 4rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.4s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), #00aaff);
+      color: black;
+      border: none;
+      box-shadow: var(--glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-8px) scale(1.07);
+      box-shadow: 0 40px 90px rgba(0,240,255,0.7);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-outline:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .features {
+      padding: 14rem 5% 18rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 3.5rem;
+    }
+
+    .card {
+      padding: 3.2rem;
+      border-radius: 28px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      transition: all 0.5s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-20px);
+      border-color: var(--accent);
+      box-shadow: 0 40px 100px rgba(0,240,255,0.35);
+    }
+
+    .card h3 {
+      font-size: 2.1rem;
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+    footer {
+      text-align: center;
+      padding: 8rem 0 10rem;
+      color: #777;
+      font-size: 1.1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .auth-box { padding: 3.5rem 2.2rem; }
+      .auth-box h1 { font-size: 4rem; }
+      .tabs { flex-direction: column; gap: 0.8rem; }
+      .tab { padding: 1.2rem; }
+      .hero h1 { font-size: 8rem; letter-spacing: -6px; }
+      .btn-group { flex-direction: column; width: 100%; max-width: 460px; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="particles-auth" class="particles-bg"></div>
+
+<!-- Страница авторизации / регистрации -->
+<div class="auth-container" id="authPage">
+
+  <div class="auth-box glass">
+
+    <h1>LENIN</h1>
+    <div class="auth-subtitle">ENTER THE VOID • PvP & PvE GODMODE 2026</div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="login">ВХОД</div>
+      <div class="tab" data-tab="register">РЕГИСТРАЦИЯ</div>
+    </div>
+
+    <!-- Форма входа -->
+    <form id="loginForm" class="auth-form active">
+      <div class="form-group">
+        <label for="login-username">Ник / e-mail</label>
+        <input type="text" id="login-username" placeholder="shadowkiller" required autocomplete="off"/>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Пароль</label>
+        <input type="password" id="login-password" placeholder="••••••••" required/>
+      </div>
+
+      <button type="submit" class="btn-auth">ВОЙТИ</button>
+    </form>
+
+    <!-- Форма регистрации -->
+    <form id="registerForm" class="auth-form" style="display:none;">
+      <div class="form-group">
+        <label for="reg-username">Желаемый ник</label>
+        <input type="text" id="reg-username" placeholder="phantom1337" required autocomplete="off"/>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-email">E-mail (опционально)</label>
+        <input type="email" id="reg-email" placeholder="you@leninclient.ru"/>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">Пароль</label>
+        <input type="password" id="reg-password" placeholder="••••••••" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password2">Повтори пароль</label>
+        <input type="password" id="reg-password2" placeholder="••••••••" required/>
+      </div>
+
+      <button type="submit" class="btn-auth">СОЗДАТЬ АККАУНТ</button>
+    </form>
+
+    <div class="info-text" id="infoText">
+      Первый вход = автоматическая регистрация
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- Главный контент -->
+<div class="main-content" id="mainContent">
+
+  <div id="particles-main" class="particles-bg"></div>
+
+  <header id="header">
+    <div class="logo">LENIN.CLIENT</div>
+
+    <div class="nav">
+      <a href="#features">Функции</a>
+      <a href="#download">Скачать</a>
+      <a href="https://discord.qq/pbhsy4aG">Discord</a>
+      <div class="profile">
+        <span id="userNick">shadowkiller</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>LENIN CLIENT</h1>
+    <div class="tagline">
+      Абсолютная мощь • 1500+ FPS • Ежемесячные обновления с имбой<br>
+      PvP — ты легенда • PvE — мобы сдаются без боя • 2026
+    </div>
+
+    <div class="btn-group" id="download">
+      <a href="LeninClient-latest.jar" download class="btn btn-primary">СКАЧАТЬ .JAR</a>
+      <a href="LeninClient-setup.exe" download class="btn btn-outline">СКАЧАТЬ .EXE</a>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="card">
+      <h3>⚔️ PvP SUPREMACY</h3>
+      <p>Aim v6 • God Reach • Velocity Elite • AutoCrystal • Scaffold God • Hitbox+</p>
+    </div>
+    <div class="card">
+      <h3>🐉 PvE DESTRUCTION</h3>
+      <p>KillAura 10+ • AutoTotem God • Jesus • Flight • Phase • NoWeb • AntiKnock</p>
+      </div>
+    <div class="card">
+      <h3>⚡ HYPER FPS</h3>
+      <p>1500+ FPS • Ноль лагов • Работает на всём железе • 1.8–1.21</p>
+    </div>
+    <div class="card">
+      <h3>🛠 MONTHLY EVOLUTION</h3>
+      <p>Каждый месяц — новые байпасы, модули, визуалы, QoL. Всегда впереди всех.</p>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Lenin Client • Private cheat universe • Use at your own risk
+  </footer>
+
+</div>
+
+
+<script>
+// Particles
+particlesJS("particles-auth", {
+  particles: {
+    number: { value: 90, density: { enable: true, value_area: 800 } },
+    color: { value: ["#00f0ff", "#c084fc", "#ff6bcb"] },
+    shape: { type: "circle" },
+    opacity: { value: 0.65, random: true },
+    size: { value: 3.8, random: true },
+    line_linked: { enable: true, distance: 150, color: "#00f0ff", opacity: 0.45, width: 1.4 },
+    move: { enable: true, speed: 2.8, direction: "none", random: true, straight: false, out_mode: "out" }
+  },
+  interactivity: {
+    events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" } },
+    modes: { grab: { distance: 200, line_linked: { opacity: 0.75 } }, push: { particles_nb: 5 } }
+  },
+  retina_detect: true
+});
+
+particlesJS("particles-main", {
+  particles: {
+    number: { value: 140, density: { enable: true, value_area: 1200 } },
+    color: { value: ["#00f0ff", "#c084fc", "#ff6bcb", "#ffffff"] },
+    shape: { type: ["circle", "triangle", "star"] },
+    opacity: { value: 0.8, random: true, anim: { enable: true, speed: 2, opacity_min: 0.15 } },
+    size: { value: 4.5, random: true, anim: { enable: true, speed: 3, size_min: 0.4 } },
+    line_linked: { enable: true, distance: 200, color: "#00f0ff", opacity: 0.55, width: 1.8 },
+    move: { enable: true, speed: 4.2, direction: "none", random: true, straight: false, out_mode: "bounce" }
+  },
+  interactivity: {
+    events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" } },
+    modes: { repulse: { distance: 140, duration: 0.5 }, push: { particles_nb: 8 } }
+  },
+  retina_detect: true
+});
+
+// Tabs переключение
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const targetForm = tab.dataset.tab === 'login' ? 'loginForm' : 'registerForm';
+    document.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+    document.getElementById(targetForm).style.display = 'block';
+
+    document.getElementById('infoText').textContent = 
+      targetForm === 'login' 
+        ? "Первый вход = автоматическая регистрация" 
+        : "Регистрация";
+  });
+});
+
+// Fake submit (для демонстрации)
+document.querySelectorAll('.auth-form').forEach(form => {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = form.querySelector('input[type="text"], input[type="email"]').value.trim();
+    if (!username) return alert("Введи ник хотя бы");
+
+    document.getElementById('userNick').textContent = username;
+
+    const auth = document.getElementById('authPage');
+    const main = document.getElementById('mainContent');
+
+    auth.style.transition = 'opacity 1.1s ease, transform 1.1s ease';
+    auth.style.opacity = '0';
+    auth.style.transform = 'scale(0.93)';
+
+    setTimeout(() => {
+      auth.style.display = 'none';
+      main.style.display = 'block';
+      main.style.opacity = '0';
+      main.style.transition = 'opacity 1.3s ease';
+      setTimeout(() => main.style.opacity = '1', 150);
+    }, 1100);
+  });
+});
+
+// Header scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('header').classList.toggle('scrolled', window.scrollY > 140);
+});
+</script>
+
+</body>
+</html>
